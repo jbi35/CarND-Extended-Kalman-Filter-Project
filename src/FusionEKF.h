@@ -22,6 +22,11 @@ public:
   virtual ~FusionEKF();
 
   /**
+  * Initialize fusion class
+  */
+  void Init(const MeasurementPackage &measurement_pack);
+
+  /**
   * Run the whole flow of the Kalman Filter from here.
   */
   void ProcessMeasurement(const MeasurementPackage &measurement_pack);
@@ -31,6 +36,8 @@ public:
   */
   KalmanFilter ekf_;
 
+
+
 private:
   // check whether the tracking toolbox was initiallized or not (first measurement)
   bool is_initialized_;
@@ -38,8 +45,10 @@ private:
   // previous timestamp
   long previous_timestamp_;
 
-  // tool object used to compute Jacobian and RMSE
-  Tools tools;
+  /**
+  * Tools object to compute Jacobian and polar coordinates.
+  */
+  Tools my_tools_;
   Eigen::MatrixXd R_laser_;
   Eigen::MatrixXd R_radar_;
   Eigen::MatrixXd H_laser_;
