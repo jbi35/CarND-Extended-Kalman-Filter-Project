@@ -8,7 +8,7 @@ KalmanFilter::KalmanFilter() {}
 KalmanFilter::~KalmanFilter() {}
 
 void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
-                         MatrixXd &Q_in) {
+                        MatrixXd &Q_in) {
   x_ = x_in;
   P_ = P_in;
   F_ = F_in;
@@ -21,13 +21,14 @@ void KalmanFilter::Predict() {
   P_ = F_ * P_ * F_.transpose() + Q_;
 }
 
-void KalmanFilter::Update(const VectorXd &z, MatrixXd &H, MatrixXd &R)
+void KalmanFilter::Update(const VectorXd &z, const MatrixXd &H, const MatrixXd &R)
 {
   VectorXd z_pred = H*x_;
   UpdateEKF(z, z_pred, H, R);
 }
 
-void KalmanFilter::UpdateEKF(const VectorXd &z, VectorXd &z_pred, MatrixXd &H, MatrixXd &R) {
+void KalmanFilter::UpdateEKF(const VectorXd &z, const VectorXd &z_pred,
+                             const MatrixXd &H, const MatrixXd &R) {
   // if z_pred and H are given, the update equations are the same for the KF and the EKF
   // and hence only implemented once
   const VectorXd y = z - z_pred;

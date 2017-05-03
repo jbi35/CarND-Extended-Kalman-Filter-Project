@@ -38,7 +38,7 @@ public:
    * @param Q_in Process covariance matrix
    */
   void Init(Eigen::VectorXd &x_in, Eigen::MatrixXd &P_in, Eigen::MatrixXd &F_in,
-      Eigen::MatrixXd &Q_in);
+            Eigen::MatrixXd &Q_in);
 
   /**
    * Prediction Predicts the state and the state covariance
@@ -51,13 +51,18 @@ public:
    * Updates the state by using standard Kalman Filter equations
    * @param z The measurement at k+1
    */
-  void Update(const Eigen::VectorXd &z, Eigen::MatrixXd &H, Eigen::MatrixXd &R);
+  void Update(const Eigen::VectorXd &z, const Eigen::MatrixXd &H,
+              const Eigen::MatrixXd &R);
 
   /**
    * Updates the state by using Extended Kalman Filter equations
    * @param z The measurement at k+1
+   * @param z_pred The prediction at k+1
+   * @param H The measurement matrix
+   * @param R The measurement covariance matrix
    */
-  void UpdateEKF(const Eigen::VectorXd &z, Eigen::VectorXd &z_pred, Eigen::MatrixXd &H, Eigen::MatrixXd &R);
+  void UpdateEKF(const Eigen::VectorXd &z, const Eigen::VectorXd &z_pred,
+                 const Eigen::MatrixXd &H, const Eigen::MatrixXd &R);
 
 };
 
