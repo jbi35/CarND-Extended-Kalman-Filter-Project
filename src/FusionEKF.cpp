@@ -30,6 +30,7 @@ FusionEKF::FusionEKF() {
 
   H_laser_ << 1.0, 0.0, 0.0, 0.0,
               0.0, 1.0, 0.0, 0.0;
+
   my_tools_ = Tools::Tools();
 
 }
@@ -53,23 +54,20 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    *  Prediction
    ****************************************************************************/
 
-  const long current_time_stamp = measurement_pack.timestamp_;
-  const float dt = (current_time_stamp - previous_timestamp_) / 1.0e6;
-
-  if (dt < 0.005f)
-  {
-   // Second of two (nearly) simultaneous measurements -> skip prediction.
+  const long current_timestamp = measurement_pack.timestamp_;
+  // get dt in seconds
+  const float dt = (current_timestamp - previous_timestamp_) / 1.0e6;
+  // if measurements are really close, simply skip the second one
+  if (dt < 1e-3)
    return;
-   cout<< "do we get here" << endl;
-  }
 
-  previous_timestamp_ = current_time_stamp;
+  previous_timestamp_ = current_timestamp;
 
   // Update process covariance matrix
   const float dt_2 = dt * dt;
   const float dt_3 = dt_2 * dt;
   const float dt_4 = dt_3 * dt;
-  const float var_a = 9; // as suggested by the project.
+  const float var_a = 9;
   ekf_.Q_ <<  dt_4/4*var_a, 0, dt_3/2*var_a, 0,
               0, dt_4/4*var_a, 0, dt_3/2*var_a,
               dt_3/2*var_a, 0, dt_2*var_a, 0,
@@ -88,7 +86,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    ****************************************************************************/
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR)
   {
-    // compute
+    // compute radar prediction
     const auto& z = measurement_pack.raw_measurements_;
     Hj_ = my_tools_.CalculateJacobian(ekf_.x_);
     const float px = ekf_.x_(0,0);
@@ -113,12 +111,15 @@ void FusionEKF::Init(const MeasurementPackage &measurement_pack)
 {
    VectorXd x;
    x = VectorXd(4);
+
+
    MatrixXd P;
    P = MatrixXd(4,4);
    P << 1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1000.0, 0.0,
         0.0, 0.0, 0.0, 1000.0;
+
    MatrixXd Q;
    Q = MatrixXd(4,4);
    MatrixXd F;
@@ -139,14 +140,16 @@ void FusionEKF::Init(const MeasurementPackage &measurement_pack)
     VectorXd pos;
     pos = VectorXd(2);
     pos = my_tools_.Polar2Cartesian(rho, phi);
-    // initialize
+
     x << pos(0,0), pos(1,0),0.0,0.0;
   }
   else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
-    x <<  measurement_pack.raw_measurements_(0,0), measurement_pack.raw_measurements_(1,0), 0.0, 0.0;
+    x <<  measurement_pack.raw_measurements_(0,0),
+          measurement_pack.raw_measurements_(1,0),
+          0.0, 0.0;
   }
   // call kalman init function
   ekf_.Init(x, P, F, Q);
-  
+
   // done initializing, no need to predict or update
 }
