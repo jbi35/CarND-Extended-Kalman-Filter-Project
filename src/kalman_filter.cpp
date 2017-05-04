@@ -34,14 +34,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const VectorXd &z_pred,
   // and hence only implemented once
   VectorXd y = z - z_pred;
   // make sure y(1) is between -pi and pi
-  while (y(1)>M_PI)
-     {
-         y(1) -= 2 * M_PI;
-     }
-     while (y(1)<-M_PI)
-     {
-         y(1) += 2 * M_PI;
-     }
+  NormalizeAngle(y);
   const MatrixXd Ht = H.transpose();
   const MatrixXd S = H * P_ * Ht + R;
   const MatrixXd K = P_ * Ht * S.inverse();
@@ -49,4 +42,16 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const VectorXd &z_pred,
   //new estimate
   x_ = x_ + (K * y);
   P_ = (I_ - K * H) * P_;
+}
+
+void KalmanFilter::NormalizeAngle(VectorXd &angle) {
+
+  while (angle(1)>M_PI)
+     {
+         angle(1) -= 2 * M_PI;
+     }
+     while (angle(1)<-M_PI)
+     {
+         angle(1) += 2 * M_PI;
+     }
 }

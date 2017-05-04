@@ -64,6 +64,12 @@ public:
   void UpdateEKF(const Eigen::VectorXd &z, const Eigen::VectorXd &z_pred,
                  const Eigen::MatrixXd &H, const Eigen::MatrixXd &R);
 
+  /**
+  * Helper funtion to normalize angle between -pi and pi
+  * @param angle angle to be normalized
+  */
+  void NormalizeAngle(Eigen::VectorXd &angle);
+
 };
 
 #endif /* KALMAN_FILTER_H_ */
