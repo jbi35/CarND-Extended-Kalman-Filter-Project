@@ -11,8 +11,6 @@ using std::vector;
 FusionEKF::FusionEKF() {
   is_initialized_ = false;
 
-  previous_timestamp_ = 0;
-
   // initializing matrices
   R_laser_ = MatrixXd(2, 2);
   R_radar_ = MatrixXd(3, 3);
@@ -129,6 +127,9 @@ void FusionEKF::Init(const MeasurementPackage &measurement_pack)
         0.0, 1.0, 0.0, 1.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0;
+
+  // init previous_timestamp_   
+  previous_timestamp_  = measurement_pack.timestamp_;
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     /**
